@@ -107,83 +107,126 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildInputArea() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            offset: Offset(0, -2),
-            blurRadius: 6,
-            color: Colors.black.withOpacity(0.1),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: TextField(
-                controller: _messageController,
-                decoration: InputDecoration(
-                  hintText: 'Ask about plants...',
-                  hintStyle: TextStyle(color: Colors.grey.shade600),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
+Widget _buildInputArea() {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      boxShadow: [
+        BoxShadow(
+          offset: Offset(0, -2),
+          blurRadius: 6,
+          color: Colors.black.withOpacity(0.1),
+        ),
+      ],
+    ),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (_selectedImage != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
+                Image.file(
+                  File(_selectedImage!.path),
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
                 ),
-                maxLines: null,
-                textCapitalization: TextCapitalization.sentences,
-                style: TextStyle(fontSize: 16),
-              ),
+                IconButton(
+                  icon: Icon(Icons.close, color: Colors.red),
+                  onPressed: () {
+                    setState(() {
+                      _selectedImage = null;
+                    });
+                  },
+                ),
+              ],
             ),
           ),
-          SizedBox(width: 8),
-          Consumer<PlantProvider>(
-            builder: (context, plantProvider, child) {
-              return IconButton(
-                icon: Icon(Icons.send_rounded),
-                onPressed: () async {
-                  if (_messageController.text.trim().isNotEmpty || _selectedImage != null) {
-                    final userId = Provider.of<UserProvider>(
-                      context,
-                      listen: false,
-                    ).user.username;
+        Row(
+          children: [
+            // Image picker button
+            IconButton(
+              icon: Icon(Icons.image),
+              onPressed: () async {
+                final picked = await _picker.pickImage(source: ImageSource.gallery);
+                if (picked != null) {
+                  setState(() {
+                    _selectedImage = picked;
+                  });
+                }
+              },
+              tooltip: 'Pick Image',
+            ),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: TextField(
+                  controller: _messageController,
+                  decoration: InputDecoration(
+                    hintText: 'Ask about plants...',
+                    hintStyle: TextStyle(color: Colors.grey.shade600),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                  ),
+                  maxLines: null,
+                  textCapitalization: TextCapitalization.sentences,
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
+            SizedBox(width: 8),
+            Consumer<PlantProvider>(
+              builder: (context, plantProvider, child) {
+                return IconButton(
+                  icon: Icon(Icons.send_rounded),
+                  onPressed: () async {
+                    if (_messageController.text.trim().isNotEmpty || _selectedImage != null) {
+                      final userId = Provider.of<UserProvider>(
+                        context,
+                        listen: false,
+                      ).user.username;
 
-                    if (_selectedImage != null) {
-                      await plantProvider.sendImageMessage(
-                        userId,
-                        _messageController.text.trim(),
-                        _selectedImage!,
-                      );
-                      _selectedImage = null; // Reset the selected image after sending
-                    } else {
-                      await plantProvider.sendTextMessage(
-                        userId,
-                        _messageController.text.trim(),
-                      );
+                      if (_selectedImage != null) {
+                        await plantProvider.sendImageMessage(
+                          userId,
+                          _messageController.text.trim(),
+                          _selectedImage!,
+                        );
+                        setState(() {
+                          _selectedImage = null;
+                        });
+                      } else {
+                        await plantProvider.sendTextMessage(
+                          userId,
+                          _messageController.text.trim(),
+                        );
+                      }
+
+                      _messageController.clear();
+                      _scrollToBottom();
                     }
-
-                    _messageController.clear();
-                    _scrollToBottom();
-                  }
-                },
-                tooltip: 'Send Message',
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
+                  },
+                  tooltip: 'Send Message',
+                );
+              },
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -207,7 +250,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     itemCount: plantProvider.messages.length,
                     itemBuilder: (context, index) {
                       return _buildMessageBubble(plantProvider.messages[index]);
-                    },
+                    }
                   );
                 },
               ),
