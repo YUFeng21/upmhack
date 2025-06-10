@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "author": "Jini",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-breadboard", "id": "bb1", "top": 64.2, "left": -208.4, "attrs": {} },
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": -288, "left": 398.44, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -278.1, "left": -149.4, "attrs": {} },
+    { "type": "wokwi-ldr", "id": "ldr1", "top": -100, "left": -90, "attrs": {} },
+    { "type": "wokwi-moisture-sensor", "id": "soil1", "top": -80, "left": -50, "attrs": {} },
+    { "type": "wokwi-buzzer", "id": "buzzer1", "top": -180, "left": 21, "attrs": {} },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "ph1",
+      "top": -279.7,
+      "left": -38.6,
+      "attrs": { "label": "pH Sensor" }
+    },
+    {
+      "type": "wokwi-photoresistor-sensor",
+      "id": "ldr2",
+      "top": -371.2,
+      "left": -47.2,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "dht1:SIG", "esp:D4", "yellow", [ "v0" ] ],
+    [ "ldr1:GND", "esp:GND.2", "black", [ "v0" ] ],
+    [ "ldr1:VCC", "esp:3V3", "red", [ "v0" ] ],
+    [ "ldr1:SIG", "esp:D34", "blue", [ "v0" ] ],
+    [ "soil1:GND", "esp:GND.3", "black", [ "v0" ] ],
+    [ "soil1:VCC", "esp:3V3", "red", [ "v0" ] ],
+    [ "soil1:SIG", "esp:D32", "green", [ "v0" ] ],
+    [ "ph1:GND", "esp:GND.4", "black", [ "v0" ] ],
+    [ "ph1:SIG", "esp:A0", "purple", [ "v0" ] ],
+    [ "buzzer1:GND", "esp:GND.5", "black", [ "v0" ] ],
+    [ "buzzer1:VCC", "esp:3V3", "red", [ "v0" ] ],
+    [ "buzzer1:SIG", "esp:D15", "orange", [ "v0" ] ],
+    [ "ph1:GND", "bb1:tn.11", "black", [ "v0" ] ],
+    [ "dht1:GND", "bb1:tn.5", "black", [ "v0" ] ],
+    [ "esp:GND.1", "bb1:tn.22", "black", [ "h0" ] ],
+    [ "dht1:VCC", "bb1:tp.2", "red", [ "v0" ] ],
+    [ "esp:5V", "bb1:tp.31", "red", [ "h0" ] ],
+    [ "ph1:VCC", "bb1:tp.13", "red", [ "v0" ] ],
+    [ "buzzer1:1", "bb1:tn.18", "green", [ "v0" ] ],
+    [ "ldr2:VCC", "bb1:tp.29", "red", [ "h0" ] ],
+    [ "ldr2:GND", "bb1:tn.30", "black", [ "h0" ] ],
+    [ "dht1:SDA", "esp:4", "green", [ "v163.2", "h672.1", "v-38.4" ] ],
+    [ "ldr2:AO", "esp:34", "green", [ "h192", "v104.9" ] ],
+    [ "ph1:SIG", "esp:35", "green", [ "v0" ] ],
+    [ "buzzer1:2", "esp:5", "green", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
